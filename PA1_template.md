@@ -9,6 +9,9 @@
 library(data.table)
 library(ggplot2)
 
+## Unzip file
+unzip('activity.zip')
+## Read in csv
 activityDS <- read.csv('activity.csv')
 ```
 #### 2. Process/transform the data
