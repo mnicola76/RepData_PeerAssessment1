@@ -1,23 +1,19 @@
----
-output:
-  html_document:
-    keep_md: yes
----
 # Reproducible Research: Peer Assessment 1
 
 ## Loading and preprocessing the data
 ## Read in activity.csv file
 
 #### 1. Load the data
-```{r }
+
+```r
 library(data.table)
 library(ggplot2)
 
 activityDS <- read.csv('activity.csv')
-
 ```
 #### 2. Process/transform the data
-```{r}
+
+```r
 ## Filter out missing obs.
 activityComplete <- activityDS[complete.cases(activityDS), ]
 ## Filter everything except the missing obs.
@@ -44,7 +40,8 @@ options(scipen=999)
 ## What is mean total number of steps taken per day?
 
 #### 1. Make a histogram of the total number of steps taken each day
-```{r histogram-ignoredNAs}
+
+```r
 ## Generate histogram plot
 myPlot <- with(activitySumDaily, 
                hist(total_steps,
@@ -54,45 +51,54 @@ myPlot <- with(activitySumDaily,
                     xlab="Total Number of Steps"))
 ```
 
+![plot of chunk histogram-ignoredNAs](./PA1_template_files/figure-html/histogram-ignoredNAs.png) 
+
 #### 2. Calculate and report the mean and median total number of steps taken p/day
 
-```{r}
+
+```r
 meanWithNAs <- mean(activitySumDaily$total_steps)
 medianWithNAs <- median(activitySumDaily$total_steps)
 ```
-Mean: `r meanWithNAs`  
-Median: `r medianWithNAs`
+Mean: 10766.1887  
+Median: 10765
 
 ## What is the average daily activity pattern?
 
 #### 1. Make a time series plot of the 5-minute interval (x-axis) and... 
 ####    the average number of steps taken, avg across days (y-axis) 
-```{r plot-AverageDailyActivity}
+
+```r
 p <- ggplot(activityAvgInterval,
             aes(x=interval, y=average_steps)) + geom_line()
 
 print(p)
 ```
 
+![plot of chunk plot-AverageDailyActivity](./PA1_template_files/figure-html/plot-AverageDailyActivity.png) 
+
 #### 2. Which 5-minute interval, on average - across all days, contains max steps
-```{r}
+
+```r
 maxInterval <- 
     activityAvgInterval[which.max(activityAvgInterval$average_steps), ]$interval
 ```
-Interval: `r maxInterval` on average contains the max steps
+Interval: 835 on average contains the max steps
 
 ## Imputing missing values
 #### 1. Calculate and report the total number of missing values
-```{r}
+
+```r
 numberOfMissingValues <- nrow(activityDS) - nrow(activityComplete)
 ```
-The total number of missing values is: `r numberOfMissingValues`
+The total number of missing values is: 2304
 
 #### 2. Devise a strategy for filling in all of the missing values in the dataset
 The following strategy in the next code chunk substitutes the missing values with the corresponding interval average
 
 #### 3. Create a new dataset that is equal to the original with missing data substituted
-```{r}
+
+```r
 ## Merge incomplete activities with data frame containing average intervals
 activityIncompleteMerge <- 
     merge(activityIncomplete, activityAvgInterval, by="interval")
@@ -129,7 +135,8 @@ setnames(activityImputedDaily, 'V1', 'total_steps')
 
 #### 4.1 Make a histogram of the total number of steps taken each day 
 
-```{r histogram-imputedNAs}
+
+```r
 ## Generate histogram plot
 myPlot <- with(activityImputedDaily, 
                hist(total_steps,
@@ -139,26 +146,30 @@ myPlot <- with(activityImputedDaily,
                     xlab="Total Number of Steps"))
 ```
 
+![plot of chunk histogram-imputedNAs](./PA1_template_files/figure-html/histogram-imputedNAs.png) 
+
 #### 4.2 Calculate and report the mean and median
 
-```{r}
+
+```r
 meanImputed <- mean(activityImputedDaily$total_steps)
 medianImputed <- median(activityImputedDaily$total_steps)                   
 ```
-Mean: `r meanImputed`  
-Median: `r medianImputed`
+Mean: 10766.1887  
+Median: 10766.1887
 
 #### 4.3 Do these values differ from the estimated from the first part?
 
-```{r}
+
+```r
 meanDiff <- meanImputed - meanWithNAs 
 medianDiff <- medianImputed - medianWithNAs 
 ```
 
 Difference between Original Mean (NAs excluded) vs Imputed Mean (NAs substituted):
-`r meanDiff`  
+0  
 Difference between Original Median (NAs excluded) vs Imputed Median (NAs substituted):
-`r medianDiff`
+1.1887
 
 It's safe to say that the difference is more or less negligible.
 
@@ -166,7 +177,8 @@ It's safe to say that the difference is more or less negligible.
 
 #### 1. Create a new factor variable in the dataset with 2 levels - 'weekday' and 'weekend'
 
-```{r}
+
+```r
 ## Convert factor date column to real date
 activityImputedDT$date <- as.Date(activityImputedDT$date, format="%Y-%m-%d")
 ## Add factor variable to indicate weekday or weekend based on date
@@ -187,10 +199,21 @@ setnames(activityImputedDoWDT, 'V1', 'average_steps')
 head(activityImputedDoWDT)
 ```
 
+```
+##    interval DayOfWeekType average_steps
+## 1:        0       weekday       2.25115
+## 2:        5       weekday       0.44528
+## 3:       10       weekday       0.17317
+## 4:       15       weekday       0.19790
+## 5:       20       weekday       0.09895
+## 6:       25       weekday       1.59036
+```
+
 #### 2. Make a panel plot containing a time series plot of the 5 minute interval (x-axis)  
 ####    and the avg number of steps taken across weekend and weekdays (y-axis)
 
-```{r plot-WeekdaysWeekendsActivityPattern}
+
+```r
 ## Generate panel plot - split by Day Of Week Type
 p <- ggplot(activityImputedDoWDT,
             aes(x=interval, y=average_steps))
@@ -202,5 +225,6 @@ p <- p +
          y = 'Number of steps')
 
 print(p)
-
 ```
+
+![plot of chunk plot-WeekdaysWeekendsActivityPattern](./PA1_template_files/figure-html/plot-WeekdaysWeekendsActivityPattern.png) 
